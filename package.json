@@ -1,0 +1,21 @@
+{
+  "name": "mantella",
+  "version": "0.0.1",
+  "description": "An engine for managing multi-step processes with automatic retries, mid-run persistence and resume.",
+  "workspaces": [
+    "./workspaces/*"
+  ],
+  "scripts": {
+    "reinstall": "rm -rf node_modules && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karlhulme/mantella.git"
+  },
+  "author": "Karl Hulme <karlhulme@hotmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/karlhulme/mantella/issues"
+  },
+  "homepage": "https://github.com/karlhulme/mantella#readme"
+}

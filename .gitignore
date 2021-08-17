@@ -1,0 +1,14 @@
+# mac attribute folders
+**/.DS_Store
+
+# test coverage produced by Istanbul (Jest)
+coverage
+
+# the lib files to be published
+lib
+
+# node modules
+node_modules
+
+# the typescript type declarations
+types
