@@ -1,8 +1,8 @@
 import chalk from 'chalk'
 import { OperationRecord, OperationStatus } from 'mantella-interfaces'
 
-export function logResult (operationName: string, record: OperationRecord): void {
-  console.log(`${logDateTime(true, record.started)} ${logRequestId(record.id)} ${logOperationName(record.status, operationName)} ${logDuration(record.durationInMs)}`)
+export function logResult (record: OperationRecord): void {
+  console.log(`${logDateTime(true, record.started)} ${logRequestId(record.id)} ${logOperationName(record.status, record.operationName)} ${logDuration(record.durationInMs)}`)
 
   if (record.error && record.finished) {
     record.logEntries.forEach(entry => console.log(`${logDateTime(false, entry.dateTime)} ${chalk.gray(entry.message)}`))
@@ -17,11 +17,11 @@ export function logResult (operationName: string, record: OperationRecord): void
   }
 }
 
-function logDateTime (prominent: boolean, dt: Date) {
+function logDateTime (prominent: boolean, dt: string) {
   if (prominent) {
-    return chalk.blue(dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString())
+    return chalk.blue(dt)
   } else {
-    return chalk.grey('           ' + dt.toLocaleTimeString())
+    return chalk.grey(dt)
   }
 }
 

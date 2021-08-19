@@ -6,8 +6,8 @@ export interface OperationRecord {
   id: string
   operationName: string
   input: unknown
-  started: Date
-  finished: Date|null
+  started: string
+  finished: string|null
   logEntries: OperationLogEntry[]
   stepDataEntries: OperationStepDataEntry[]
   status: OperationStatus

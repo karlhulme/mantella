@@ -1,5 +1,5 @@
 export interface OperationRejectedProps {
-  requestId: string
+  requestId?: string
   message: string
   isClientError: boolean
 }
