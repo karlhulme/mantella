@@ -1,14 +1,14 @@
 import { retryable, RetryableOptions } from 'piggle'
 import { OperationStepDataEntry } from 'mantella-interfaces'
 
-interface ExecuteStepProps<T> {
+interface ExecuteStepFuncProps<T> {
   stepDataEntries: OperationStepDataEntry[]
   retryableOptions: RetryableOptions
   stepFunc: () => Promise<T>
   stepName: string
 }
 
-export async function executeStep<T> (props: ExecuteStepProps<T>): Promise<T> {
+export async function executeStepFunc<T> (props: ExecuteStepFuncProps<T>): Promise<T> {
   const existingStepDataEntry = props.stepDataEntries.find(step => step.name === props.stepName)
 
   if (existingStepDataEntry) {

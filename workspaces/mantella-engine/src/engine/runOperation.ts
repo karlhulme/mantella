@@ -5,7 +5,7 @@ import {
 import { MantellaClientError } from '../errors'
 import { logResult } from './logResult'
 import { validateOperationInput } from './validateOperationInput'
-import { executeStep } from './executeStep'
+import { executeStepFunc } from './executeStepFunc'
 
 interface RunOperationProps {
   operation: OperationDefinition<unknown, unknown>
@@ -37,7 +37,7 @@ export async function runOperation (props: RunOperationProps): Promise<void> {
     log: message => props.record.logEntries.push({ message, dateTime: new Date().toISOString() }),
     requestId: props.record.id,
     step: async (stepName, func, retryableOptions) => {
-      const data = await executeStep({
+      const data = await executeStepFunc({
         stepDataEntries: props.record.stepDataEntries,
         retryableOptions: { ...retryableOptions },
         stepFunc: func,
