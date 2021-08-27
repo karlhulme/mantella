@@ -3,12 +3,14 @@ import {
   OperationDefinition, OperationRejectedProps, OperationResolvedProps
 } from 'mantella-interfaces'
 import { v4 } from 'uuid'
-import { createNewOperationContext } from './createNewOperationContext'
-import { runOperation } from './runOperation'
+import { createNewOperationRecord } from './createNewOperationRecord'
+import { executeOperation } from './executeOperation'
+import { logResult } from './logResult'
 
 export interface MantellaConstructorProps<Services> {
   operations?: OperationDefinition<unknown, unknown>[]
   loadOperation?: (props: LoadOperationProps) => Promise<LoadOperationResult>
+  defaultRetryIntervalsInMilliseconds?: number[]
   saveOperation?: (props: SaveOperationProps) => Promise<SaveOperationResult>
   services?: Services
 }
@@ -18,15 +20,15 @@ export interface StartOperationProps {
   operationName?: string
   requestId?: string
   resolveStep?: string
-  onResolveOperation?: (props: OperationResolvedProps) => void
-  onRejectOperation?: (props: OperationRejectedProps) => void
+  resolveOperation?: (props: OperationResolvedProps) => void
+  rejectOperation?: (props: OperationRejectedProps) => void
 }
 
 export interface ResumeOperationProps {
   requestId?: string
   resolveStep?: string
-  onResolveOperation?: (props: OperationResolvedProps) => void
-  onRejectOperation?: (props: OperationRejectedProps) => void
+  resolveOperation?: (props: OperationResolvedProps) => void
+  rejectOperation?: (props: OperationRejectedProps) => void
 }
 
 export class Mantella<Services> {
@@ -34,6 +36,7 @@ export class Mantella<Services> {
   private services: Services
   private loadOperation: (props: LoadOperationProps) => Promise<LoadOperationResult>
   private saveOperation: (props: SaveOperationProps) => Promise<SaveOperationResult>
+  private defaultRetryIntervalsInMilliseconds: number[]
 
   /**
    * Creates a new Mantella engine based on a set of services and
@@ -51,17 +54,18 @@ export class Mantella<Services> {
     }
 
     if (!props.loadOperation) {
-      throw new Error('You must supply an onLoadOperation function.')
+      throw new Error('You must supply an loadOperation function.')
     }
 
     if (!props.saveOperation) {
-      throw new Error('You must supply an onSaveOperation function.')
+      throw new Error('You must supply an saveOperation function.')
     }
 
     this.operations = props.operations
     this.services = props.services
     this.loadOperation = props.loadOperation
     this.saveOperation = props.saveOperation
+    this.defaultRetryIntervalsInMilliseconds = props.defaultRetryIntervalsInMilliseconds || [100, 250, 500, 1000, 2000, 4000, 8000, 15000, 30000]
   }
 
   async startOperation (props: StartOperationProps): Promise<void> {
@@ -83,22 +87,25 @@ export class Mantella<Services> {
       throw new Error(`Operation name '${props.operationName}' was not recognised.`)
     }
 
-    if (!props.onResolveOperation) {
-      throw new Error('You must supply an onResolveOperation function.')
+    if (!props.resolveOperation) {
+      throw new Error('You must supply an resolveOperation function.')
     }
 
-    if (!props.onRejectOperation) {
-      throw new Error('You must supply an onRejectOperation function.')
+    if (!props.rejectOperation) {
+      throw new Error('You must supply an rejectOperation function.')
     }
 
-    await runOperation({
+    await executeOperation({
+      canContinueProcessing: () => true,
+      defaultRetryIntervalsInMilliseconds: this.defaultRetryIntervalsInMilliseconds,
+      logResult,
       operation,
-      onResolveOperation: props.onResolveOperation,
-      onRejectOperation: props.onRejectOperation,
-      onSaveOperation: async record => { await this.saveOperation({ record }) },
-      record: createNewOperationContext(props.requestId || v4(), operation.name, props.input),
-      requestId: props.requestId,
-      resolveStep: props.resolveStep,
+      resolveOperation: props.resolveOperation,
+      rejectOperation: props.rejectOperation,
+      saveOperation: async record => { await this.saveOperation({ record }) },
+      record: createNewOperationRecord(props.requestId || v4(), operation.name, props.input),
+      requestIdSupplied: Boolean(props.requestId),
+      resolveStep: props.resolveStep || null,
       services: this.services
     })
   }
@@ -122,22 +129,25 @@ export class Mantella<Services> {
       throw new Error(`Operation '${props.requestId}' uses unknown operation definition '${record.operationName}'.`)
     }
 
-    if (!props.onResolveOperation) {
-      throw new Error('You must supply an onResolveOperation function.')
+    if (!props.resolveOperation) {
+      throw new Error('You must supply an resolveOperation function.')
     }
 
-    if (!props.onRejectOperation) {
-      throw new Error('You must supply an onRejectOperation function.')
+    if (!props.rejectOperation) {
+      throw new Error('You must supply an rejectOperation function.')
     }
 
-    await runOperation({
+    await executeOperation({
+      canContinueProcessing: () => true,
+      defaultRetryIntervalsInMilliseconds: this.defaultRetryIntervalsInMilliseconds,
+      logResult,
       operation,
-      onResolveOperation: props.onResolveOperation,
-      onRejectOperation: props.onRejectOperation,
-      onSaveOperation: async record => { await this.saveOperation({ record }) },
+      resolveOperation: props.resolveOperation,
+      rejectOperation: props.rejectOperation,
+      saveOperation: async record => { await this.saveOperation({ record }) },
       record,
-      requestId: props.requestId,
-      resolveStep: props.resolveStep,
+      requestIdSupplied: Boolean(props.requestId),
+      resolveStep: props.resolveStep || null,
       services: this.services
     })
   }

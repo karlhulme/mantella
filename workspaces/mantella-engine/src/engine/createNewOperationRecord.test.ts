@@ -1,8 +1,8 @@
 import { expect, test } from '@jest/globals'
-import { createNewOperationContext } from './createNewOperationContext'
+import { createNewOperationRecord } from './createNewOperationRecord'
 
 test('A new operation context can be created.', () => {
-  expect(createNewOperationContext('1234', 'test', { foo: 'bar' })).toEqual({
+  expect(createNewOperationRecord('1234', 'test', { foo: 'bar' })).toEqual({
     id: '1234',
     operationName: 'test',
     input: { foo: 'bar' },

@@ -6,7 +6,7 @@ import { OperationRecord } from 'mantella-interfaces'
  * @param operationName The name of the operation.
  * @param input The input payload passed to the operation.
  */
-export function createNewOperationContext (requestId: string, operationName: string, input: unknown): OperationRecord {
+export function createNewOperationRecord (requestId: string, operationName: string, input: unknown): OperationRecord {
   return ({
     id: requestId,
     operationName: operationName,

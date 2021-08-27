@@ -22,7 +22,7 @@
     "@types/node": "^16.6.1",
     "@types/uuid": "8.3.1",
     "chalk": "4.1.2",
-    "piggle": "^5.0.1",
+    "piggle": "^6.0.0",
     "uuid": "8.3.2"
   },
   "devDependencies": {
