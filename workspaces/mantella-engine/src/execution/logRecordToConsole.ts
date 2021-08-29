@@ -9,12 +9,10 @@ import { OperationRecord, OperationStatus } from 'mantella-interfaces'
 export function logRecordToConsole (consoleLog: (msg: string) => void, record: OperationRecord): void {
   consoleLog(`${formatDateTime(true, record.started)} ${chalk.white(record.id)} ${formatOperationName(record.status, record.operationName)} ${chalk.yellow(record.durationInMs)} ms`)
 
-  if (record.error) {
+  if (record.error && record.finished) {
     record.logEntries.forEach(entry => consoleLog(`${formatDateTime(false, entry.dateTime)} ${chalk.gray(entry.message)}`))
 
-    if (record.finished) {
-      consoleLog(`${formatDateTime(false, record.finished)} ${chalk.grey('End')}`)
-    }
+    consoleLog(`${formatDateTime(false, record.finished)} ${chalk.grey('Stall')}`)
 
     record.stepDataEntries.forEach(entry => {
       consoleLog(`${chalk.magenta(entry.name + ':')} ${chalk.grey(JSON.stringify(entry.data, null, 2))}`)

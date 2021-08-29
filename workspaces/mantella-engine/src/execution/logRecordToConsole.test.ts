@@ -47,26 +47,8 @@ test('A failed operation is logged over multiple lines.', async () => {
   expect(consoleLog.mock.calls[0][0]).toContain('2021-08-27 15:09:01')
   expect(consoleLog.mock.calls[1][0]).toContain('msg1')
   expect(consoleLog.mock.calls[2][0]).toContain('15:09:04')
-  expect(consoleLog.mock.calls[2][0]).toContain('End')
+  expect(consoleLog.mock.calls[2][0]).toContain('Stall')
   expect(consoleLog.mock.calls[3][0]).toContain('s1')
   expect(consoleLog.mock.calls[4][0]).toContain('err:')
   expect(consoleLog.mock.calls[4][0]).toContain('ERROR_TEXT')
-})
-
-test('A failed operation is even if there is no finished date/time.', async () => {
-  const record = createOperationRecord()
-  record.status = 'failed'
-  record.error = 'ERROR_TEXT'
-  record.finished = null
-  const consoleLog = jest.fn()
-
-  expect(() => logRecordToConsole(consoleLog, record)).not.toThrow()
-
-  expect(consoleLog).toBeCalledTimes(4)
-  expect(consoleLog.mock.calls[0][0]).toContain('✗ testOp')
-  expect(consoleLog.mock.calls[0][0]).toContain('2021-08-27 15:09:01')
-  expect(consoleLog.mock.calls[1][0]).toContain('msg1')
-  expect(consoleLog.mock.calls[2][0]).toContain('s1')
-  expect(consoleLog.mock.calls[3][0]).toContain('err:')
-  expect(consoleLog.mock.calls[3][0]).toContain('ERROR_TEXT')
 })

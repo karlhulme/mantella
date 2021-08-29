@@ -122,15 +122,16 @@ export async function executeOperation (props: ExecuteOperationProps): Promise<v
     props.record.error = err.toString()
   }
 
+  // Determine the time spent processing the operation.
+  props.record.finished = new Date().toISOString()
+  const duration = process.hrtime(timerStart)
+  props.record.durationInMs += ((duration[0] * 1000) + Math.trunc(duration[1] / 1000000))
+
   // If the client did not request the data be returned after a
   // particular step then return a response now.
   if (!hasSentResponse) {
     props.sendResponse()
   }
-
-  // Determine the time spent processing the operation.
-  const duration = process.hrtime(timerStart)
-  props.record.durationInMs += ((duration[0] * 1000) + Math.trunc(duration[1] / 1000000))
 
   // Save the final record if we're saving progress or if an error occurred.
   // This will save processes that fail due to invalid input.
