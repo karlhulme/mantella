@@ -15,9 +15,20 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 15.x
-    - name: Install deps and run tests
+    - name: Install deps
+      run: npm ci
+    - name: Build interfaces library
       run: |
-        npm ci
+        cd workspaces/mantella-interfaces
+        npm run build
+    - name: Test engine
+      run: |
+        cd workspaces/mantella-engine
         npm test
-      env:
-        CI: true
+        npm run build
+    - name: Test express wrapper
+      run: |
+        cd workspaces/mantella-express
+        npm test
+        npm run build
+

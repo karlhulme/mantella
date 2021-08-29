@@ -15,13 +15,22 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 15.x
-    - name: Install deps and run tests
+    - name: Install deps
+      run: npm ci
+    - name: Build interfaces library
       run: |
-        npm ci
+        cd workspaces/mantella-interfaces
+        npm run build
+    - name: Test engine
+      run: |
+        cd workspaces/mantella-engine
         npm test
         npm run build
-      env:
-        CI: true
+    - name: Test express wrapper
+      run: |
+        cd workspaces/mantella-express
+        npm test
+        npm run build
         
   release:
     runs-on: ubuntu-latest
@@ -34,7 +43,6 @@ jobs:
           branchName: main
         env:
           GITHUB_TOKEN: ${{ github.token }}
-
       - name: Create GitHub Release
         if: steps.prepare.outputs.canRelease == 'yes'
         id: release
@@ -45,25 +53,42 @@ jobs:
           releaseNotes: ${{ steps.prepare.outputs.releaseNotes }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
-
       - name: Clone repo
         if: steps.prepare.outputs.canRelease == 'yes'
         uses: actions/checkout@v1
         with:
           ref: v${{ steps.prepare.outputs.releaseVersion }}
-
       - name: Setup Node.js 15
         if: steps.prepare.outputs.canRelease == 'yes'
         uses: actions/setup-node@v1
         with:
           node-version: 15.x
           registry-url: https://registry.npmjs.org/
+      - name: Publish interfaces
+        if: steps.release.outputs.didRelease == 'yes'
+        run: |
+          cd workspaces/mantella-interfaces
+          npm version ${{ steps.prepare.outputs.releaseVersion }}
+          npm run build
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+      - name: Publish engine
+        if: steps.release.outputs.didRelease == 'yes'
+        run: |
+          cd workspaces/mantella-engine
+          npm version ${{ steps.prepare.outputs.releaseVersion }}
+          npm run build
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+      - name: Publish express wrapper
+        if: steps.release.outputs.didRelease == 'yes'
+        run: |
+          cd workspaces/mantella-express
+          npm version ${{ steps.prepare.outputs.releaseVersion }}
+          npm run build
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
 
-      # - name: Publish to NPM
-      #   if: steps.prepare.outputs.canRelease == 'yes'
-      #   run: |
-      #     npm ci
-      #     npm run build
-      #     npm publish
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{secrets.npm_token}}
