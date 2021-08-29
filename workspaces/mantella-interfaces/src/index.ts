@@ -1,4 +1,5 @@
 export * from './engine'
+export * from './errors'
 export * from './execution'
 export * from './op'
 export * from './opDefs'

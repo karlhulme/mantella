@@ -1,4 +1,4 @@
-import { MantellaMalformedOperationInputError } from '../errors'
+import { MantellaMalformedOperationInputError } from 'mantella-interfaces'
 
 /**
  * Raises a MantellaBadRequestError if the given validator raises an error when invoked

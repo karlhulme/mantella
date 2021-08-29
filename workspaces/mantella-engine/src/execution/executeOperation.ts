@@ -2,7 +2,7 @@ import { OperationContext, OperationDefinition, OperationRecord } from 'mantella
 import { validateOperationInput } from './validateOperationInput'
 import { executeStep } from './executeStep'
 import { determineOperationStatusFromError } from './determineOperationStatusFromError'
-import { OPERATION_START } from '../consts'
+import { RESOLVE_IMMEDIATELY } from '../consts'
 
 /**
  * Defines the properties required to execute an operation.
@@ -107,7 +107,7 @@ export async function executeOperation (props: ExecuteOperationProps): Promise<v
     validateOperationInput(props.record.input, props.operation.inputValidator)
 
     // Check to see if we need to return immediately
-    if (props.resolveStep === OPERATION_START) {
+    if (props.resolveStep === RESOLVE_IMMEDIATELY) {
       hasSentResponse = true
       props.sendResponse()
     }

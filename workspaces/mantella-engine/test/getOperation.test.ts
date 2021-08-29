@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import { MantellaClientError, MantellaClientOperationNotFoundError } from '../src'
+import { MantellaClientError, MantellaClientOperationNotFoundError } from 'mantella-interfaces'
 import { createTestMantella } from './shared.test'
 
 test('Get an existing operation.', async () => {

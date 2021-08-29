@@ -7,11 +7,15 @@ import {
   LoadOperationFromDatabaseResult,
   SaveOperationToDatabaseProps,
   ResumeOperationProps,
-  OperationRecord
+  OperationRecord,
+  MantellaEngine,
+  MantellaClientError,
+  MantellaClientOperationNotFoundError,
+  MantellaLoadOperationFromDatabaseInvalidResponseError,
+  MantellaLoadOperationFromDatabaseUnexpectedError
 } from 'mantella-interfaces'
 import { v4 } from 'uuid'
-import { OPERATION_START } from '../consts'
-import { MantellaClientError, MantellaClientOperationNotFoundError, MantellaLoadOperationFromDatabaseInvalidResponseError, MantellaLoadOperationFromDatabaseUnexpectedError } from '../errors'
+import { RESOLVE_IMMEDIATELY } from '../consts'
 import { createNewOperationRecord, executeOperation, logRecordToConsole } from '../execution'
 
 /**
@@ -62,7 +66,7 @@ export interface MantellaConstructorProps<Services> {
 /**
  * A class for executing operations in a fault resilient manner.
  */
-export class Mantella<Services> {
+export class Mantella<Services> implements MantellaEngine {
   private canContinueProcessing: () => boolean
   private operations: OperationDefinition<unknown, unknown>[]
   private services: Services
@@ -270,7 +274,7 @@ export class Mantella<Services> {
    */
   private getLastCompletedStep (record: OperationRecord): string {
     if (record.stepDataEntries.length === 0) {
-      return OPERATION_START
+      return RESOLVE_IMMEDIATELY
     } else {
       return record.stepDataEntries[record.stepDataEntries.length - 1].name
     }

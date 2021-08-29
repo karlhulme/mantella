@@ -1,6 +1,8 @@
 import { expect, jest, test } from '@jest/globals'
-import { ResumeOperationProps, StartOperationProps } from 'mantella-interfaces'
-import { MantellaLoadOperationFromDatabaseInvalidResponseError, MantellaLoadOperationFromDatabaseUnexpectedError } from '../src'
+import {
+  ResumeOperationProps, StartOperationProps,
+  MantellaLoadOperationFromDatabaseInvalidResponseError, MantellaLoadOperationFromDatabaseUnexpectedError
+} from 'mantella-interfaces'
 import { createTestMantella } from './shared.test'
 
 test('An unexpected error loading an operation is handled.', async () => {

@@ -1,6 +1,5 @@
 import { expect, jest, test } from '@jest/globals'
-import { StartOperationProps, OperationFunction } from 'mantella-interfaces'
-import { MantellaOperationRejectedError } from '../src'
+import { StartOperationProps, OperationFunction, MantellaOperationRejectedError } from 'mantella-interfaces'
 import { createTestMantella } from './shared.test'
 
 function createStartOpParams (): StartOperationProps {

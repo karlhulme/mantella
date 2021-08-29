@@ -1,6 +1,5 @@
 import { expect, jest, test } from '@jest/globals'
-import { ResumeOperationProps } from 'mantella-interfaces'
-import { MantellaClientError, MantellaClientOperationNotFoundError } from '../src'
+import { ResumeOperationProps, MantellaClientError, MantellaClientOperationNotFoundError } from 'mantella-interfaces'
 import { createTestMantella } from './shared.test'
 
 function createResumeOpParams (): ResumeOperationProps {

@@ -1,6 +1,6 @@
 import { OperationStatus } from 'mantella-interfaces'
 import { OperationInterruptedError } from 'piggle'
-import { MantellaOperationRejectedError, MantellaMalformedOperationInputError } from '../errors'
+import { MantellaOperationRejectedError, MantellaMalformedOperationInputError } from 'mantella-interfaces'
 
 /**
  * Determines the correct operation status as a result of an error.

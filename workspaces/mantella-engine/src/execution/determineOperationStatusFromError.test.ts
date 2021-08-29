@@ -1,6 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { OperationInterruptedError } from 'piggle'
-import { MantellaMalformedOperationInputError, MantellaOperationRejectedError } from '../errors'
+import { MantellaMalformedOperationInputError, MantellaOperationRejectedError } from 'mantella-interfaces'
 import { determineOperationStatusFromError } from './determineOperationStatusFromError'
 
 test('An unrecognised error means the new status is failed.', () => {

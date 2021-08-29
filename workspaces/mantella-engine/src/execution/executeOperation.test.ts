@@ -1,6 +1,8 @@
 import { expect, jest, test } from '@jest/globals'
-import { OperationDefinition, OperationRecord, OperationStatus } from 'mantella-interfaces'
-import { MantellaMalformedOperationInputError, MantellaOperationRejectedError } from '../errors'
+import {
+  OperationDefinition, OperationRecord, OperationStatus,
+  MantellaMalformedOperationInputError, MantellaOperationRejectedError
+} from 'mantella-interfaces'
 import { executeOperation } from './executeOperation'
 
 interface TestInput {

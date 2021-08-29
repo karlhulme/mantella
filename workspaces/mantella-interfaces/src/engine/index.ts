@@ -1,5 +1,6 @@
 export * from './GetOperationProps'
 export * from './GetOperationResult'
+export * from './MantellaEngine'
 export * from './OperationRequestRejectedProps'
 export * from './OperationRequestResolvedProps'
 export * from './ResumeOperationProps'

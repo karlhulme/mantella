@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals'
-import { MantellaMalformedOperationInputError } from '../errors'
+import { MantellaMalformedOperationInputError } from 'mantella-interfaces'
 import { validateOperationInput } from './validateOperationInput'
 
 test('A validator that accepts the input, does not raise', () => {
