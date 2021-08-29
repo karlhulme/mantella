@@ -1,6 +1,6 @@
 {
   "name": "mantella",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An engine for managing multi-step processes with automatic retries, mid-run persistence and resume.",
   "workspaces": [
     "./workspaces/*"
