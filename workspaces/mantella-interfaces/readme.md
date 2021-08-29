@@ -8,11 +8,6 @@
 A set of **interfaces**, **types**, **function signatures**, **callback signatures** and **errors** used by the packages of the Mantella system.
 
 
-## Guide
-
-A mantella service is concerned only with mutating data by processing a series of steps.  It is not for handling any type of client query.  For this reason, a mantella service should not return data.
-
-
 ## Installation
 
 ```bash

@@ -24,6 +24,6 @@
     "typescript": "^4.0.5"
   },
   "dependencies": {
-    "piggle": "^5.0.1"
+    "piggle": "^6.0.0"
   }
 }
