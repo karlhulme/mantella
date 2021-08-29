@@ -64,6 +64,9 @@ jobs:
         with:
           node-version: 15.x
           registry-url: https://registry.npmjs.org/
+      - name: Install deps
+        if: steps.release.outputs.didRelease == 'yes'
+        run: npm ci
       - name: Publish interfaces
         if: steps.release.outputs.didRelease == 'yes'
         run: |

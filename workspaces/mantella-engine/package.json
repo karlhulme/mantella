@@ -23,7 +23,7 @@
     "@types/uuid": "8.3.1",
     "chalk": "4.1.2",
     "piggle": "^6.0.0",
-    "uuid": "8.3.2"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.6.0",
