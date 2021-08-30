@@ -18,19 +18,32 @@ npm install mantella-engine mantella-express mantella-interfaces
 Define a series of multi-step operations, each one conforming to the `OperationDefinition` interface.  Within the function, you can call the `step` function whenever you need to issue a request that could fail for transitory reasons.  Once a step has completed successfully it will not be run again - even if the operation is resumed.
 
 ```typescript
-  const operation: OperationDefinition<string, string> = {
+  const myOperation: OperationDefinition<string, string> = {
     name: 'testOp', // name the operation
     inputValidator: () => undefined, // raise an exception if the input is not what you expect 
     saveProgress: false, // set to true if the operation must be saved, useful for critical operations
-    func: async ({ log, services, step }) => {
+    func: async ({ log, pause, services, step }) => {
       log({ message: 'open' }) // log messages at any point
-      await step({ stepName: 'step1', func: async () => 'foo' }) // name each step, and make network/db calls
-      // the services property is determined when you create the mantella-engine
+      pause(100) // pause execution for a number of milliseconds
+      await step({ // execute a step...
+        stepName: 'step1', // the name of the step
+        func: async () => services.callExternalService('foo'), // the meat of the step that probably makes a network call
+        isErrorTransient: err => err.statusCode === 503, // decide which errors are transient so that the engine can keep trying the step
+        retryIntervalsInMilliseconds: [100, 200, 400] // the retry strategy expressed as the number of milliseconds between each attempt
+      })
     }
   }
 ```
 
-You can instantiate a Mantella engine by providing functions for reading and writing operations to a database.
+The last line, `await step(...)` is perhaps the most illustrative.  These are the steps that really define an operation.  The step function parameters are as follows:
+* **stepName** - The name of the step.  This is how the engine ensures that each step is only run once, so it must be unique.
+* **func** - The actual function to run.  You'll typically want to call external services and databases here.  You can access those via the `services` object that is passed to the Mantella engine when it is created.
+* **isErrorTransient** - A function that takes an `Error` and returns true if the error is transient.  This instructs the Mantella engine to keep trying this step until it succeeds.  You can inspect an error's status code or examine its "type" or any other mechanism you want to determine if it's safe to retry.  If an error occurs and it cannot be retried then the operation will fail at this point.
+* **retryIntervalsInMilliseconds** - The number of milliseconds between each retry.  You can specify a default set when constructing the Mantella engine.  If you do neither then by default it will retry about 10 times, for up to a minute, using an exponential backoff strategy.
+
+As an alternative to specifying `isErrorTransient`, you can also raise an `OperationTransitoryError` (or a derivative) which is always interpreted as transitory.
+
+Once you've defined a set of operations you can instantiate a Mantella engine.
 
 ```typescript
   // Define the services that should be made available to all operations.
@@ -41,9 +54,15 @@ You can instantiate a Mantella engine by providing functions for reading and wri
 
   // Create a mantella engine.
   const mantella = new Mantella<MyServices>({
+    clients: [{
+      name: 'admin',
+      apiKeys: ['adminKey'],
+      operations: true,
+      manage: true
+    }],
     loadOperationFromDatabase: async () => ({}),
     saveOperationToDatabase: async () => undefined,
-    operations: [],
+    operations: [myOperation],
     services: {
       accessToSystem1: () => undefined,
       dataProperty2: 'example'

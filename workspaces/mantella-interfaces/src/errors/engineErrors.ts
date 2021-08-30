@@ -3,7 +3,7 @@ import { MantellaError } from './baseError'
 /**
  * Raised by the Mentella engine.
  */
- export class MantellaInternalError extends MantellaError {
+ export class MantellaEngineError extends MantellaError {
   /**
    * Constructs a new instance.
    * @param message The reason the request cannot be processed.
@@ -19,7 +19,7 @@ import { MantellaError } from './baseError'
  * Raised by the engine when the delegate supplied for loading operations
  * does not return a valid response.
  */
- export class MantellaLoadOperationFromDatabaseInvalidResponseError extends MantellaInternalError {
+ export class MantellaLoadOperationFromDatabaseInvalidResponseError extends MantellaEngineError {
   /**
    * Constructs a new instance.
    * @param innerError The error raised by the loadOperationFromDatabase delegate.
@@ -35,7 +35,7 @@ import { MantellaError } from './baseError'
  * Raised by the engine when the delegate supplied for loading operations
  * raises an error.
  */
-export class MantellaLoadOperationFromDatabaseUnexpectedError extends MantellaInternalError {
+export class MantellaLoadOperationFromDatabaseUnexpectedError extends MantellaEngineError {
   /**
    * Constructs a new instance.
    * @param innerError The error raised by the loadOperationFromDatabase delegate.
