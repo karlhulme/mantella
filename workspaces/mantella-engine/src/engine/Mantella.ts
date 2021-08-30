@@ -113,7 +113,7 @@ export class Mantella<Services> implements MantellaEngine {
     this.apiKeysNotFoundInEnv = 0
     this.canContinueProcessing = props.canContinueProcessing || (() => true)
     this.clients = props.clients || []
-    this.defaultRetryIntervalsInMilliseconds = props.defaultRetryIntervalsInMilliseconds || [100, 250, 500, 1000, 2000, 4000, 8000, 15000, 30000]
+    this.defaultRetryIntervalsInMilliseconds = props.defaultRetryIntervalsInMilliseconds || [100, 250, 500, 1000, 2000, 4000, 8000, 15000, 25000]
     this.loadOperationFromDatabase = props.loadOperationFromDatabase
     this.logToConsole = typeof props.logToConsole === 'boolean' ? props.logToConsole : true
     this.operations = props.operations
