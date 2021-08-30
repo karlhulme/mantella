@@ -12,11 +12,14 @@ import {
   MantellaClientError,
   MantellaClientOperationNotFoundError,
   MantellaLoadOperationFromDatabaseInvalidResponseError,
-  MantellaLoadOperationFromDatabaseUnexpectedError
+  MantellaLoadOperationFromDatabaseUnexpectedError,
+  Client
 } from 'mantella-interfaces'
 import { v4 } from 'uuid'
 import { RESOLVE_IMMEDIATELY } from '../consts'
 import { createNewOperationRecord, executeOperation, logRecordToConsole } from '../execution'
+import { ensureClient } from '../security'
+import { ensureManageOperationsPermission, ensureStartOperationPermission } from '../security/ensurePermissions'
 
 /**
  * Defines the constructor parameters of a new Mantella instance.
@@ -27,6 +30,11 @@ export interface MantellaConstructorProps<Services> {
    * This is useful for handling a graceful shutdown.
    */
   canContinueProcessing?: () => boolean
+
+  /**
+   * An array of clients that have access to the mantella engine.
+   */
+  clients?: Client[]
 
   /**
    * An array of operation definitions.
@@ -67,13 +75,16 @@ export interface MantellaConstructorProps<Services> {
  * A class for executing operations in a fault resilient manner.
  */
 export class Mantella<Services> implements MantellaEngine {
+  private apiKeysLoadedFromEnv: number
+  private apiKeysNotFoundInEnv: number
   private canContinueProcessing: () => boolean
-  private operations: OperationDefinition<unknown, unknown>[]
-  private services: Services
-  private loadOperationFromDatabase: (props: LoadOperationFromDatabaseProps) => Promise<LoadOperationFromDatabaseResult>
-  private saveOperationToDatabase: (props: SaveOperationToDatabaseProps) => Promise<void>
+  private clients: Client[]
   private defaultRetryIntervalsInMilliseconds: number[]
+  private loadOperationFromDatabase: (props: LoadOperationFromDatabaseProps) => Promise<LoadOperationFromDatabaseResult>
   private logToConsole: boolean
+  private operations: OperationDefinition<unknown, unknown>[]
+  private saveOperationToDatabase: (props: SaveOperationToDatabaseProps) => Promise<void>
+  private services: Services
 
   /**
    * Creates a new Mantella engine based on a set of services and
@@ -98,13 +109,18 @@ export class Mantella<Services> implements MantellaEngine {
       throw new Error('You must supply an saveOperationToDatabase function.')
     }
 
+    this.apiKeysLoadedFromEnv = 0
+    this.apiKeysNotFoundInEnv = 0
     this.canContinueProcessing = props.canContinueProcessing || (() => true)
-    this.operations = props.operations
-    this.services = props.services
-    this.loadOperationFromDatabase = props.loadOperationFromDatabase
-    this.saveOperationToDatabase = props.saveOperationToDatabase
+    this.clients = props.clients || []
     this.defaultRetryIntervalsInMilliseconds = props.defaultRetryIntervalsInMilliseconds || [100, 250, 500, 1000, 2000, 4000, 8000, 15000, 30000]
+    this.loadOperationFromDatabase = props.loadOperationFromDatabase
     this.logToConsole = typeof props.logToConsole === 'boolean' ? props.logToConsole : true
+    this.operations = props.operations
+    this.saveOperationToDatabase = props.saveOperationToDatabase
+    this.services = props.services
+
+    this.hydrateClientApiKeys()
   }
 
   /**
@@ -112,6 +128,13 @@ export class Mantella<Services> implements MantellaEngine {
    * @param props A property bag.
    */
   async getOperation (props: GetOperationProps): Promise<GetOperationResult> {
+    if (!props.apiKey) {
+      throw new MantellaClientError('You must supply an apiKey.')
+    }
+
+    const client = ensureClient(props.apiKey, this.clients)
+    ensureManageOperationsPermission(client)
+
     if (!props.operationId) {
       throw new MantellaClientError('You must supply an operationId.')
     }
@@ -132,6 +155,12 @@ export class Mantella<Services> implements MantellaEngine {
    * @param props A property bag.
    */
   async startOperation (props: StartOperationProps): Promise<void> {
+    if (!props.apiKey) {
+      throw new MantellaClientError('You must supply an apiKey.')
+    }
+
+    const client = ensureClient(props.apiKey, this.clients)
+
     if (!props.operationName) {
       throw new MantellaClientError('You must supply an operation name.')
     }
@@ -149,6 +178,8 @@ export class Mantella<Services> implements MantellaEngine {
     if (!operation) {
       throw new MantellaClientError(`Operation name '${props.operationName}' was not recognised.`)
     }
+
+    ensureStartOperationPermission(client, props.operationName)
 
     if (!props.sendResponse) {
       throw new MantellaClientError('You must supply a sendResponse function.')
@@ -184,6 +215,13 @@ export class Mantella<Services> implements MantellaEngine {
    * @param props A property bag.
    */
   async resumeOperation (props: ResumeOperationProps): Promise<void> {
+    if (!props.apiKey) {
+      throw new MantellaClientError('You must supply an apiKey.')
+    }
+
+    const client = ensureClient(props.apiKey, this.clients)
+    ensureManageOperationsPermission(client)
+
     if (!props.operationId) {
       throw new MantellaClientError('You must supply an operationId.')
     }
@@ -224,6 +262,23 @@ export class Mantella<Services> implements MantellaEngine {
     if (this.logToConsole) {
       logRecordToConsole(console.log, record)
     }
+  }
+
+  /**
+   * Returns the number of api keys that were replaced
+   * when hydrating the clients.
+   */
+  getApiKeysLoadedFromEnvCount (): number {
+    return this.apiKeysLoadedFromEnv
+  }
+
+  /**
+   * Returns the number of api keys that were dropped
+   * when hydrating the clients because references were
+   * made to non-existent environment variables.
+   */
+  getApiKeysNotFoundInEnvCount (): number {
+    return this.apiKeysNotFoundInEnv
   }
 
   /**
@@ -277,6 +332,28 @@ export class Mantella<Services> implements MantellaEngine {
       return RESOLVE_IMMEDIATELY
     } else {
       return record.stepDataEntries[record.stepDataEntries.length - 1].name
+    }
+  }
+
+  /**
+   * Replaces the apiKeys elements of any client that reference environment variables
+   * with the actual value loaded from 'process.env'.
+   */
+  private hydrateClientApiKeys (): void {
+    for (const client of this.clients) {
+      for (let index = client.apiKeys.length - 1; index >= 0; index--) {
+        if (client.apiKeys[index].startsWith('$')) {
+          const loadedApiKey = process.env[client.apiKeys[index].substring(1)]
+
+          if (loadedApiKey) {
+            this.apiKeysLoadedFromEnv++
+            client.apiKeys[index] = loadedApiKey
+          } else {
+            this.apiKeysNotFoundInEnv++
+            client.apiKeys.splice(index, 1)
+          }
+        }
+      }
     }
   }
 }

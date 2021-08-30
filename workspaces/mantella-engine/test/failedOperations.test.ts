@@ -4,6 +4,7 @@ import { createTestMantella } from './shared.test'
 
 function createStartOpParams (): StartOperationProps {
   return {
+    apiKey: 'adminKey',
     operationId: '1234',
     input: { foo: 'bar' },
     operationName: 'testOp',

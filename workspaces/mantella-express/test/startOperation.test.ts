@@ -14,6 +14,7 @@ test('200 - start a new operation', async () => {
   expect(response.header['mantella-last-completed-step']).toEqual('step1')
 
   expect(mockMantellaEngine.startOperation).toHaveBeenCalledWith({
+    apiKey: 'adminKey',
     input: { foo: 'bar' },
     operationName: 'testOp',
     sendResponse: expect.any(Function)
@@ -32,6 +33,7 @@ test('200 - start a new operation with an explicit request/operation id', async 
   expect(response.header['mantella-last-completed-step']).toEqual('step1')
 
   expect(mockMantellaEngine.startOperation).toHaveBeenCalledWith({
+    apiKey: 'adminKey',
     input: { foo: 'bar' },
     operationId: '5678',
     operationName: 'testOp',
@@ -63,6 +65,7 @@ test('202 - start a new operation with a resolve step', async () => {
   expect(response.header['mantella-last-completed-step']).toEqual('step1')
 
   expect(mockMantellaEngine.startOperation).toHaveBeenCalledWith({
+    apiKey: 'adminKey',
     input: { foo: 'bar' },
     operationName: 'testOp',
     resolveStep: 'targetStep',

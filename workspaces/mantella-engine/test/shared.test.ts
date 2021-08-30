@@ -43,6 +43,12 @@ export function createTestMantella (props?: CreateMantellaProps): Mantella<strin
   Object.assign(operation, props?.operationDefinition)
 
   const ctorProps: MantellaConstructorProps<string> = {
+    clients: [{
+      name: 'admin',
+      apiKeys: ['adminKey'],
+      operations: true,
+      manage: true
+    }],
     loadOperationFromDatabase: async () => ({ record: props?.loadedOperation === null ? undefined : record }),
     saveOperationToDatabase: async () => undefined,
     operations: [operation as OperationDefinition<unknown, unknown>],

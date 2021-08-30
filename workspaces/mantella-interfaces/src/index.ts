@@ -1,3 +1,4 @@
+export * from './client'
 export * from './engine'
 export * from './errors'
 export * from './execution'

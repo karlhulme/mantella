@@ -13,12 +13,13 @@ export async function startOperationHandler (props: RequestHandlerProps): Promis
   try {
     ensureHeaderJsonContentType(props.req.headers[HttpHeaderNames.ContentType])
 
-    /* const apiKey = */ensureHeaderApiKey(props.req.headers[HttpHeaderNames.ApiKey])
+    const apiKey = ensureHeaderApiKey(props.req.headers[HttpHeaderNames.ApiKey])
     const operationName = props.matchedResource.urlParams['operationName']
     const requestId = ensureHeaderRequestId(props.req.headers[HttpHeaderNames.RequestId])
     const resolveStep = ensureHeaderResolveStep(props.req.headers[HttpHeaderNames.ResolveStep])
 
     await props.mantella.startOperation({
+      apiKey,
       input: props.req.body,
       operationId: requestId,
       operationName,
@@ -27,7 +28,7 @@ export async function startOperationHandler (props: RequestHandlerProps): Promis
         applyResultToHttpResponse(props.res, {
           headers: {
             location: `${props.baseUrl}ops/${responseProps.operationId}`,
-            'mantella-last-completed-step': responseProps.lastCompletedStep
+            [HttpHeaderNames.LastCompletedStep]: responseProps.lastCompletedStep
           },
           statusCode: determineResponseStatusCode(responseProps.operationStatus),
           text: determineResponseErrorText(responseProps.operationStatus, responseProps.error)

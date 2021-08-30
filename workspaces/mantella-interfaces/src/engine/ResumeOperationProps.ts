@@ -3,7 +3,12 @@ import { ResumeOperationSendResponseProps } from './ResumeOperationSendResponseP
 /**
  * Defines the properties required to resume an operation.
  */
- export interface ResumeOperationProps {
+export interface ResumeOperationProps {
+  /**
+   * The api key associated with the request.
+   */
+  apiKey?: string
+
   /**
    * The id of the operation to resume.
    */
@@ -21,5 +26,5 @@ import { ResumeOperationSendResponseProps } from './ResumeOperationSendResponseP
    * the client.  This function will not be invoked if an exception
    * is raised.
    */
-   sendResponse?: (props: ResumeOperationSendResponseProps) => void
+  sendResponse?: (props: ResumeOperationSendResponseProps) => void
 }

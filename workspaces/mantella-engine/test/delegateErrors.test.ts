@@ -13,6 +13,7 @@ test('An unexpected error loading an operation is handled.', async () => {
   })
 
   const resumeOpParams: ResumeOperationProps = {
+    apiKey: 'adminKey',
     operationId: '1234',
     sendResponse: jest.fn()
   }
@@ -29,6 +30,7 @@ test('A failure to return an object result when loading an operation is handled.
   })
 
   const resumeOpParams: ResumeOperationProps = {
+    apiKey: 'adminKey',
     operationId: '1234',
     sendResponse: jest.fn()
   }
@@ -48,6 +50,7 @@ test('An error saving an operation is swallowed.', async () => {
   })
 
   const startOpParams: StartOperationProps = {
+    apiKey: 'adminKey',
     operationId: '1234', // using an operationId forces saving
     input: { foo: 'bar' },
     operationName: 'testOp',

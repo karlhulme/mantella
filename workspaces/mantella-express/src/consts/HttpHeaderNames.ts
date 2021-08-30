@@ -24,6 +24,11 @@ export const HttpHeaderNames = {
   ResolveStep: 'mantella-resolve-step',
 
   /**
+   * The name of the last completed step.
+   */
+  LastCompletedStep: 'mantella-last-completed-step',
+
+  /**
    * The client api key.
    */
   ApiKey: 'x-api-key',

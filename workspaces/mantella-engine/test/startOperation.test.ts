@@ -4,6 +4,7 @@ import { createTestMantella } from './shared.test'
 
 function createStartOpParams (): StartOperationProps {
   return {
+    apiKey: 'adminKey',
     operationId: '1234',
     input: { foo: 'bar' },
     operationName: 'testOp',
@@ -56,6 +57,15 @@ test('Fail to start an operation if the operation id has already been used.', as
 
   await expect(mentella.startOperation(startOpParams)).rejects.toThrow(MantellaClientError as unknown as Error)
   await expect(mentella.startOperation(startOpParams)).rejects.toThrow('already exists')
+})
+
+test('Fail to start an operation if an api key is not supplied.', async () => {
+  const mentella = createTestMantella({ loadedOperation: null })
+  const startOpParams = createStartOpParams()
+  delete startOpParams.apiKey
+
+  await expect(mentella.startOperation(startOpParams)).rejects.toThrow(MantellaClientError as unknown as Error)
+  await expect(mentella.startOperation(startOpParams)).rejects.toThrow('apiKey')
 })
 
 test('Fail to start an operation if the operation name is not specified.', async () => {

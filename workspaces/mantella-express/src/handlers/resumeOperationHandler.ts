@@ -11,17 +11,18 @@ import { RequestHandlerProps } from './RequestHandlerProps'
  */
 export async function resumeOperationHandler (props: RequestHandlerProps): Promise<void> {
   try {
-    /* const apiKey = */ensureHeaderApiKey(props.req.headers[HttpHeaderNames.ApiKey])
+    const apiKey = ensureHeaderApiKey(props.req.headers[HttpHeaderNames.ApiKey])
     const operationId = props.matchedResource.urlParams['id']
     const resolveStep = ensureHeaderResolveStep(props.req.headers[HttpHeaderNames.ResolveStep])
 
     await props.mantella.resumeOperation({
+      apiKey,
       operationId,
       resolveStep,
       sendResponse: responseProps => {
         applyResultToHttpResponse(props.res, {
           headers: {
-            'mantella-last-completed-step': responseProps.lastCompletedStep
+            [HttpHeaderNames.LastCompletedStep]: responseProps.lastCompletedStep
           },
           statusCode: determineResponseStatusCode(responseProps.operationStatus),
           text: determineResponseErrorText(responseProps.operationStatus, responseProps.error)

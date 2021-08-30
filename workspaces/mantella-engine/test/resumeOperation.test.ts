@@ -4,6 +4,7 @@ import { createTestMantella } from './shared.test'
 
 function createResumeOpParams (): ResumeOperationProps {
   return {
+    apiKey: 'adminKey',
     operationId: '1234',
     sendResponse: jest.fn()
   }
@@ -28,6 +29,15 @@ test('Resume an existing operation but resolve early.', async () => {
 
   expect(resumeOpParams.sendResponse).toHaveBeenCalledTimes(1)
   expect(resumeOpParams.sendResponse).toHaveBeenCalledWith({ operationStatus: 'running', error: null, lastCompletedStep: 'step1' })
+})
+
+test('Fail to resume an operation if an api key is not supplied.', async () => {
+  const mentella = createTestMantella({ loadedOperation: null })
+  const resumeOpParams = createResumeOpParams()
+  delete resumeOpParams.apiKey
+
+  await expect(mentella.resumeOperation(resumeOpParams)).rejects.toThrow(MantellaClientError as unknown as Error)
+  await expect(mentella.resumeOperation(resumeOpParams)).rejects.toThrow('apiKey')
 })
 
 test('Fail to resume an operation if the operation id is not valid.', async () => {

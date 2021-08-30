@@ -14,6 +14,7 @@ test('200 - resume an new operation', async () => {
   expect(response.header['mantella-last-completed-step']).toEqual('step1')
 
   expect(mockMantellaEngine.resumeOperation).toHaveBeenCalledWith({
+    apiKey: 'adminKey',
     operationId: '5678',
     sendResponse: expect.any(Function)
   })
@@ -42,6 +43,7 @@ test('202 - resume an operation with a resolve step', async () => {
   expect(response.header['mantella-last-completed-step']).toEqual('step1')
 
   expect(mockMantellaEngine.resumeOperation).toHaveBeenCalledWith({
+    apiKey: 'adminKey',
     operationId: '5678',
     resolveStep: 'targetStep',
     sendResponse: expect.any(Function)

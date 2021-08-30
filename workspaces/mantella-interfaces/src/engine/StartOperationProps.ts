@@ -3,7 +3,12 @@ import { StartOperationSendResponseProps } from './StartOperationSendResponsePro
 /**
  * Defines the properties required to start a new operation running.
  */
- export interface StartOperationProps {
+export interface StartOperationProps {
+  /**
+   * The api key associated with the request.
+   */
+  apiKey?: string
+
   /**
    * The payload used to initialise the operation.
    */

@@ -11,10 +11,13 @@ export async function getOperationHandler (props: RequestHandlerProps): Promise<
   try {
     ensureHeaderJsonAcceptType(props.req.headers[HttpHeaderNames.AcceptType])
 
-    /* const apiKey = */ensureHeaderApiKey(props.req.headers[HttpHeaderNames.ApiKey])
+    const apiKey = ensureHeaderApiKey(props.req.headers[HttpHeaderNames.ApiKey])
     const operationId = props.matchedResource.urlParams['id']
 
-    const result = await props.mantella.getOperation({ operationId })
+    const result = await props.mantella.getOperation({
+      apiKey,
+      operationId
+    })
 
     applyResultToHttpResponse(props.res, {
       statusCode: 200,
