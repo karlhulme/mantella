@@ -1,3 +1,4 @@
+import { pause } from 'piggle'
 import { OperationContext, OperationDefinition, OperationRecord } from 'mantella-interfaces'
 import { validateOperationInput } from './validateOperationInput'
 import { executeStep } from './executeStep'
@@ -84,7 +85,9 @@ export async function executeOperation (props: ExecuteOperationProps): Promise<v
   const context: OperationContext<unknown, unknown> = {
     input: props.record.input,
     log: ({ message }) => props.record.logEntries.push({ message, dateTime: new Date().toISOString() }),
+    pause: milliseconds => pause(milliseconds),
     requestId: props.record.id,
+    services: props.services,
     step: async ({ func, stepName, isErrorTransient, retryIntervalsInMilliseconds }) => {
       return await executeStep({
         stepDataEntries: props.record.stepDataEntries,
@@ -98,8 +101,7 @@ export async function executeOperation (props: ExecuteOperationProps): Promise<v
         saveOperation: async () => props.saveOperation(),
         saveProgress: isSavingRequired
       })
-    },
-    services: props.services
+    }
   }
 
   try {

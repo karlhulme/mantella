@@ -18,8 +18,9 @@ function createTestDefinition (): OperationDefinition<TestInput, TestServices> {
     name: 'testOp',
     inputValidator: () => ({ foo: 'bar' }),
     saveProgress: false,
-    func: async ({ log, step }) => {
+    func: async ({ log, pause, step }) => {
       log({ message: 'hello' })
+      pause(100)
       await step({ stepName: 's1', func: async () => 's1result' })
     }
   }

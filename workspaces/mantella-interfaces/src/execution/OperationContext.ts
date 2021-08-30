@@ -16,17 +16,22 @@ export interface OperationContext<Input, Services> {
   log: (props: OperationContextLogProps) => void
 
   /**
-   * A function for executing a step in an atomic, retryable manner.
+   * A function for delaying execution by a specified number of milliseconds.
    */
-  step: <T>(props: OperationContextStepProps<T>) => Promise<T>
+  pause: (milliseconds: number) => Promise<void>
 
   /**
    * The id assigned to the operation.
    */
   requestId: string
 
-  /**
-   * The services supplied to the operation by the host application.
-   */
+   /**
+    * The services supplied to the operation by the host application.
+    */
   services: Services
+
+  /**
+   * A function for executing a step in an atomic, retryable manner.
+   */
+  step: <T>(props: OperationContextStepProps<T>) => Promise<T>
 }
