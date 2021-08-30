@@ -1,6 +1,6 @@
 import { test, expect, jest } from '@jest/globals'
 import { Request, Response } from 'express'
-import { MantellaClientOperationNotFoundError } from 'mantella-interfaces'
+import { MantellaClientInsufficientPermissionToManageOperationsError, MantellaClientInsufficientPermissionToStartOperationError, MantellaClientOperationNotFoundError, MantellaClientUnrecognisedApiKeyError } from 'mantella-interfaces'
 import { MantellaExpressRequestError, MantellaExpressUnsupportedRequestContentTypeError, MantellaExpressUnsupportedResponseContentTypeError } from '../errors'
 import { applyErrorToHttpResponse } from './applyErrorToHttpResponse'
 
@@ -65,18 +65,26 @@ test('Apply a doc not found error to an http response', () => {
   expect(res.status).toHaveProperty(['mock', 'calls', '0'], [404])
 })
 
-// test('Apply an action forbidden error to an http response', () => {
-//   const req = createMockReq()
-//   const res = createMockRes()
-//   applyErrorToHttpResponse(req, res, { err: new MantellaActionForbiddenByPolicyError('film', 'delete') })
-//   expect(res.status).toHaveProperty('mock.calls.length', 1)
-//   expect(res.status).toHaveProperty(['mock', 'calls', '0'], [403])
-// })
+test('Apply a manage operations forbidden error to an http response', () => {
+  const req = createMockReq()
+  const res = createMockRes()
+  applyErrorToHttpResponse(req, res, { err: new MantellaClientInsufficientPermissionToManageOperationsError('clientA') })
+  expect(res.status).toHaveProperty('mock.calls.length', 1)
+  expect(res.status).toHaveProperty(['mock', 'calls', '0'], [403])
+})
 
-// test('Apply an api key not supplied error to an http response', () => {
-//   const req = createMockReq()
-//   const res = createMockRes()
-//   applyErrorToHttpResponse(req, res, { err: new MantellaActionForbiddenByPolicyError('film', 'delete') })
-//   expect(res.status).toHaveProperty('mock.calls.length', 1)
-//   expect(res.status).toHaveProperty(['mock', 'calls', '0'], [401])
-// })
+test('Apply a start operation forbidden error to an http response', () => {
+  const req = createMockReq()
+  const res = createMockRes()
+  applyErrorToHttpResponse(req, res, { err: new MantellaClientInsufficientPermissionToStartOperationError('clientA', 'operationB') })
+  expect(res.status).toHaveProperty('mock.calls.length', 1)
+  expect(res.status).toHaveProperty(['mock', 'calls', '0'], [403])
+})
+
+test('Apply an api key not recognised error to an http response', () => {
+  const req = createMockReq()
+  const res = createMockRes()
+  applyErrorToHttpResponse(req, res, { err: new MantellaClientUnrecognisedApiKeyError() })
+  expect(res.status).toHaveProperty('mock.calls.length', 1)
+  expect(res.status).toHaveProperty(['mock', 'calls', '0'], [401])
+})

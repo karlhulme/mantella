@@ -2,7 +2,10 @@ import { Request, Response } from 'express'
 import { HttpHeaderNames, INTERNAL_ERROR_TEXT } from '../consts'
 import {
   MantellaClientError,
-  MantellaClientOperationNotFoundError
+  MantellaClientInsufficientPermissionToManageOperationsError,
+  MantellaClientInsufficientPermissionToStartOperationError,
+  MantellaClientOperationNotFoundError,
+  MantellaClientUnrecognisedApiKeyError
 } from 'mantella-interfaces'
 import {
   MantellaExpressRequestError,
@@ -31,13 +34,14 @@ function determineStatusFromError (err: Error): number {
     return 404
   }
 
-  // if (err instanceof MantellaAuthorisationFailedError) { // meaning the api-key does not have rights on the operationName
-  //   return 403
-  // }
+  if (err instanceof MantellaClientInsufficientPermissionToManageOperationsError ||
+    err instanceof MantellaClientInsufficientPermissionToStartOperationError) {
+    return 403
+  }
 
-  // if (err instanceof MantellaUnrecognisedApiKeyError) {
-  //   return 401
-  // }
+  if (err instanceof MantellaClientUnrecognisedApiKeyError) {
+    return 401
+  }
 
   if (err instanceof MantellaClientError ||
     err instanceof MantellaExpressRequestError) {
