@@ -109,6 +109,33 @@ In addition, an operation is saved at every stage of processing if any of the fo
 Otherwise, an operation is not saved.  This reduces the database IO burden associated with running an operation but it means you cannot review the operation after the event.
 
 
+## Shutdown
+
+When a Mantella host is shutdown, you need to complete or interrupt the existing operations.
+
+To do this, ensure the `canContinueProcessing` function passed to the Mantella constructor returns false.  This will prevent Mantella from attempting any more steps.  The existing operations will be marked as `interrupted` and saved to the database.
+
+```typescript
+  let running = true
+  const isRunning = () => running
+
+  // start listening (assume that app was created using the Getting started guide)
+  const server = app.listen(8080, () => {
+    console.log(`👣  Server listening...`)
+  })
+
+  process.on('SIGTERM', () => {
+    console.log('Shutdown requested.')
+    running = false // mantella will start interrupting operations
+    server.close() // stop accepting any new connections
+  })
+```
+
+Using the default retry strategies, Mantella should stop processing within 30 seconds.  This depends on the saveOperationToDatabase performing efficiently.  Mantella will not shutdown if operation steps are taking longer than 30 seconds.  Address this by establishing timeouts on those calls, either individually or by providing a client on the Service object with timeouts pre-configured.
+
+You may find that an Express server doesn't shutdown even though Mantella has stopped all processing.  This is likely because some HTTP clients specified the Keep-Alive header and so the connections are still active within Express.  You can use process.exit() if you want to force it to close, but this differs little from allowing a host (such as Kubernetes or Docker) from killing the process anyway.
+
+
 ## Development
 
 Code written in Typescript.
