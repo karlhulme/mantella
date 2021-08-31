@@ -126,8 +126,8 @@ To do this, ensure the `canContinueProcessing` function passed to the Mantella c
 
   process.on('SIGTERM', () => {
     console.log('Shutdown requested.')
-    running = false // mantella will start interrupting operations
     server.close() // stop accepting any new connections
+    setTimeout(() => { running = false }, 10000) // allow 10 seconds for processing to finish then interrupt 
   })
 ```
 

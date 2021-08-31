@@ -54,7 +54,9 @@ export interface MantellaConstructorProps<Services> {
   logToConsole?: boolean
 
   /**
-   * The retry intervals to use by default when retrying operation steps.
+   * The retry intervals to use by default when retrying operation steps.  If not specified the
+   * default is to retry using an exponential backoff strategy that reaches a maximum interval
+   * of 15 seconds over the course of 1 minute.
    */
   defaultRetryIntervalsInMilliseconds?: number[]
 
@@ -113,7 +115,8 @@ export class Mantella<Services> implements MantellaEngine {
     this.apiKeysNotFoundInEnv = 0
     this.canContinueProcessing = props.canContinueProcessing || (() => true)
     this.clients = props.clients || []
-    this.defaultRetryIntervalsInMilliseconds = props.defaultRetryIntervalsInMilliseconds || [100, 250, 500, 1000, 2000, 4000, 8000, 15000, 25000]
+    this.defaultRetryIntervalsInMilliseconds = props.defaultRetryIntervalsInMilliseconds ||
+      [100, 250, 500, 1000, 2000, 4000, 8000, 15000, 15000, 15000]
     this.loadOperationFromDatabase = props.loadOperationFromDatabase
     this.logToConsole = typeof props.logToConsole === 'boolean' ? props.logToConsole : true
     this.operations = props.operations
