@@ -28,7 +28,8 @@ test('200 - get an operation that exists', async () => {
       }],
       status: 'failed',
       durationInMs: 2000,
-      error: 'previous_error_condition'
+      error: 'previous_error_condition',
+      output: null
     }
   })
 })

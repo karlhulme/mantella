@@ -1,9 +1,10 @@
 import { HttpHeaderNames } from '../consts'
 import { ensureHeaderApiKey, ensureHeaderResolveStep } from '../requestValidation'
 import { applyErrorToHttpResponse, applyResultToHttpResponse } from '../responseGeneration'
-import { determineResponseErrorText } from './determineResponseErrorText'
+import { determineResponseText } from './determineResponseText'
 import { determineResponseStatusCode } from './determineResponseStatusCode'
 import { RequestHandlerProps } from './RequestHandlerProps'
+import { determineResponseJson } from './determineResponseJson'
 
 /**
  * Handles the request to resume an existing operation and produces a response.
@@ -25,11 +26,12 @@ export async function resumeOperationHandler (props: RequestHandlerProps): Promi
             [HttpHeaderNames.LastCompletedStep]: responseProps.lastCompletedStep
           },
           statusCode: determineResponseStatusCode(responseProps.operationStatus),
-          text: determineResponseErrorText(responseProps.operationStatus, responseProps.error)
+          text: determineResponseText(responseProps.operationStatus, responseProps.operationError),
+          json: determineResponseJson(responseProps.operationStatus, responseProps.operationOutput)
         })
       }
     })
   } catch (err) {
-    applyErrorToHttpResponse(props.req, props.res, { err })
+    applyErrorToHttpResponse(props.req, props.res, { err: err as Error })
   }
 }

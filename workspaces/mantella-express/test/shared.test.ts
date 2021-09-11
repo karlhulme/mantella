@@ -26,14 +26,16 @@ export function createTestableApp (props?: CreateTestableAppProps): { testableAp
         }],
         status: 'failed',
         durationInMs: 2000,
-        error: 'previous_error_condition'
+        error: 'previous_error_condition',
+        output: null
       }
     }),
     resumeOperation: jest.fn(async resumeProps => {
       resumeProps && resumeProps.sendResponse && resumeProps.sendResponse({
         operationStatus: 'completed',
         lastCompletedStep: 'step1',
-        error: null
+        operationError: null,
+        operationOutput: null
       })
     }),
     startOperation: jest.fn(async startProps => {
@@ -41,7 +43,8 @@ export function createTestableApp (props?: CreateTestableAppProps): { testableAp
         operationId: startProps.operationId || '1234',
         operationStatus: 'completed',
         lastCompletedStep: 'step1',
-        error: null
+        operationError: null,
+        operationOutput: null
       })
     })
   }

@@ -17,7 +17,7 @@ test('Resume an existing operation to completion.', async () => {
   await expect(mentella.resumeOperation(resumeOpParams)).resolves.not.toThrow()
 
   expect(resumeOpParams.sendResponse).toHaveBeenCalledTimes(1)
-  expect(resumeOpParams.sendResponse).toHaveBeenCalledWith({ operationStatus: 'completed', error: null, lastCompletedStep: 'step1' })
+  expect(resumeOpParams.sendResponse).toHaveBeenCalledWith({ operationStatus: 'completed', operationError: null, operationOutput: null, lastCompletedStep: 'step1' })
 })
 
 test('Resume an existing operation but resolve early.', async () => {
@@ -28,7 +28,7 @@ test('Resume an existing operation but resolve early.', async () => {
   await expect(mentella.resumeOperation(resumeOpParams)).resolves.not.toThrow()
 
   expect(resumeOpParams.sendResponse).toHaveBeenCalledTimes(1)
-  expect(resumeOpParams.sendResponse).toHaveBeenCalledWith({ operationStatus: 'running', error: null, lastCompletedStep: 'step1' })
+  expect(resumeOpParams.sendResponse).toHaveBeenCalledWith({ operationStatus: 'running', operationError: null, operationOutput: null, lastCompletedStep: 'step1' })
 })
 
 test('Fail to resume an operation if an api key is not supplied.', async () => {

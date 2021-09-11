@@ -18,7 +18,7 @@ test('Start a new operation and run it to completion.', async () => {
 
   await expect(mentella.startOperation(startOpParams)).resolves.not.toThrow()
   expect(startOpParams.sendResponse).toHaveBeenCalledTimes(1)
-  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'completed', error: null, lastCompletedStep: 'step1' })
+  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'completed', operationError: null, operationOutput: null, lastCompletedStep: 'step1' })
 })
 
 test('Start a new operation but resolve early.', async () => {
@@ -28,7 +28,7 @@ test('Start a new operation but resolve early.', async () => {
 
   await expect(mentella.startOperation(startOpParams)).resolves.not.toThrow()
   expect(startOpParams.sendResponse).toHaveBeenCalledTimes(1)
-  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'running', error: null, lastCompletedStep: 'step1' })
+  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'running', operationError: null, operationOutput: null, lastCompletedStep: 'step1' })
 })
 
 test('Start a new operation but resolve immediately.', async () => {
@@ -38,7 +38,7 @@ test('Start a new operation but resolve immediately.', async () => {
 
   await expect(mentella.startOperation(startOpParams)).resolves.not.toThrow()
   expect(startOpParams.sendResponse).toHaveBeenCalledTimes(1)
-  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'running', error: null, lastCompletedStep: '^' })
+  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'running', operationError: null, operationOutput: null, lastCompletedStep: '^' })
 })
 
 test('Start a new operation but without supplying an operation id.', async () => {
@@ -48,7 +48,7 @@ test('Start a new operation but without supplying an operation id.', async () =>
 
   await expect(mentella.startOperation(startOpParams)).resolves.not.toThrow()
   expect(startOpParams.sendResponse).toHaveBeenCalledTimes(1)
-  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: expect.any(String), operationStatus: 'completed', error: null, lastCompletedStep: 'step1' })
+  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: expect.any(String), operationStatus: 'completed', operationError: null, operationOutput: null, lastCompletedStep: 'step1' })
 })
 
 test('Fail to start an operation if the operation id has already been used.', async () => {

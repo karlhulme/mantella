@@ -20,6 +20,29 @@ test('200 - resume an new operation', async () => {
   })
 })
 
+test('200 - resume an operation that generates output', async () => {
+  const { testableApp } = createTestableApp({
+    mantellaEngine: {
+      resumeOperation: jest.fn(async (resumeProps: ResumeOperationProps) => {
+        resumeProps && resumeProps.sendResponse && resumeProps.sendResponse({
+          operationStatus: 'completed',
+          lastCompletedStep: 'step1',
+          operationError: null,
+          operationOutput: { out: 'put' }
+        })
+      })
+    }
+  })  
+
+  const response = await supertest(testableApp)
+    .post('/root/ops/5678:resume')
+    .set('x-api-key', 'adminKey')
+    .send()
+
+  expect(response.status).toEqual(200)
+  expect(response.body).toEqual({ out: 'put' })
+})
+
 test('202 - resume an operation with a resolve step', async () => {
   const { testableApp, mockMantellaEngine } = createTestableApp({
     mantellaEngine: {
@@ -27,7 +50,8 @@ test('202 - resume an operation with a resolve step', async () => {
         resumeProps && resumeProps.sendResponse && resumeProps.sendResponse({
           operationStatus: 'running',
           lastCompletedStep: 'step1',
-          error: null
+          operationError: null,
+          operationOutput: null
         })
       })
     }
@@ -57,7 +81,8 @@ test('400 - resume an operation that fails due to a client input error', async (
         resumeProps && resumeProps.sendResponse && resumeProps.sendResponse({
           operationStatus: 'rejected',
           lastCompletedStep: 'step1',
-          error: 'BAD_INPUT'
+          operationError: 'BAD_INPUT',
+          operationOutput: null
         })
       })
     }
@@ -79,7 +104,8 @@ test('500 - resume an operation that fails due to the service shutting down', as
         resumeProps && resumeProps.sendResponse && resumeProps.sendResponse({
           operationStatus: 'interrupted',
           lastCompletedStep: 'step1',
-          error: 'INTERRUPT'
+          operationError: 'INTERRUPT',
+          operationOutput: null
         })
       })
     }
@@ -101,7 +127,8 @@ test('500 - resume an operation that fails due to a failed operation', async () 
         resumeProps && resumeProps.sendResponse && resumeProps.sendResponse({
           operationStatus: 'failed',
           lastCompletedStep: 'step1',
-          error: 'FAILED'
+          operationError: 'FAILED',
+          operationOutput: null
         })
       })
     }

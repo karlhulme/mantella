@@ -3,7 +3,8 @@ import { OperationContext, OperationDefinition, OperationRecord } from 'mantella
 import { validateOperationInput } from './validateOperationInput'
 import { executeStep } from './executeStep'
 import { determineOperationStatusFromError } from './determineOperationStatusFromError'
-import { RESOLVE_IMMEDIATELY } from '../consts'
+import { RESOLVE_IMMEDIATELY, RESOLVE_ON_OUTPUT } from '../consts'
+import { OperationSaveStrategy } from 'mantella-interfaces/types/opDefs/OperationSaveStrategy'
 
 /**
  * Defines the properties required to execute an operation.
@@ -68,7 +69,12 @@ export async function executeOperation (props: ExecuteOperationProps): Promise<v
   // Init the timers, resolved status and determine if saving is required.
   const timerStart = process.hrtime()
   let hasSentResponse = false
-  const isSavingRequired = Boolean(props.saveProgress || props.operation.saveProgress)
+
+  // Determine the save strategy, which may be overriden by the client
+  // supplying an operationg id.
+  const saveModel: OperationSaveStrategy = props.saveProgress
+    ? 'always'
+    : props.operation.saveModel
 
   // Put the record into the running state and discard any error from the previous execution.
   props.record.status = 'running'
@@ -76,7 +82,7 @@ export async function executeOperation (props: ExecuteOperationProps): Promise<v
 
   // If this operation is going to be saved after each step
   // then also save the inputs before we begin.
-  if (isSavingRequired) {
+  if (saveModel === 'always') {
     await props.saveOperation()
   }
 
@@ -99,8 +105,16 @@ export async function executeOperation (props: ExecuteOperationProps): Promise<v
         canContinueProcessing: props.canContinueProcessing,
         sendResponse: () => { hasSentResponse = true; props.sendResponse(); },
         saveOperation: async () => props.saveOperation(),
-        saveProgress: isSavingRequired
+        saveProgress: saveModel === 'always'
       })
+    },
+    output: ({ value }) => {
+      props.record.output = value
+
+      if (props.resolveStep === RESOLVE_ON_OUTPUT && !hasSentResponse) {
+        hasSentResponse = true
+        props.sendResponse()
+      }
     }
   }
 
@@ -120,8 +134,11 @@ export async function executeOperation (props: ExecuteOperationProps): Promise<v
     props.record.status = 'completed'
 
   } catch (err) {
-    props.record.status = determineOperationStatusFromError(err)
-    props.record.error = err.toString()
+    const error = err as Error
+    props.record.status = determineOperationStatusFromError(error)
+    props.record.error = props.record.status === 'rejected'
+      ? error.message
+      : `${error.message}\n${error.stack}`
   }
 
   // Determine the time spent processing the operation.
@@ -135,9 +152,14 @@ export async function executeOperation (props: ExecuteOperationProps): Promise<v
     props.sendResponse()
   }
 
-  // Save the final record if we're saving progress or if an error occurred.
-  // This will save processes that fail due to invalid input.
-  if (isSavingRequired || props.record.error) {
+  // Determine if we need to make a final save, which depends on both the
+  // saving strategy and also how the operation ended.
+  const isFinalSaveRequired = saveModel === 'always' ||
+    props.record.status === 'interrupted' ||
+    (saveModel === 'error' && props.record.status === 'failed') ||
+    (saveModel === 'rejection' && ['failed', 'rejected'].includes(props.record.status))
+
+  if (isFinalSaveRequired) {
     await props.saveOperation()
   }
 }

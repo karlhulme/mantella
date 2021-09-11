@@ -12,6 +12,7 @@ test('A new operation context can be created.', () => {
     stepDataEntries: [],
     status: 'running',
     durationInMs: 0,
-    error: null
+    error: null,
+    output: null
   })
 })

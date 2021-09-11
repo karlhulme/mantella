@@ -19,7 +19,8 @@ test('Get an existing operation.', async () => {
       stepDataEntries: expect.anything(),
       status: 'failed',
       durationInMs: 2000,
-      error: 'previous_error_condition'
+      error: 'previous_error_condition',
+      output: null
     }
   })
 })

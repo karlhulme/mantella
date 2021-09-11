@@ -25,7 +25,8 @@ export function createTestMantella (props?: CreateMantellaProps): Mantella<strin
     }],
     status: 'failed',
     durationInMs: 2000,
-    error: 'previous_error_condition'
+    error: 'previous_error_condition',
+    output: null
   }
 
   Object.assign(record, props?.loadedOperation)
@@ -33,7 +34,7 @@ export function createTestMantella (props?: CreateMantellaProps): Mantella<strin
   const operation: OperationDefinition<string, string> = {
     name: 'testOp',
     inputValidator: () => undefined,
-    saveProgress: false,
+    saveModel: 'error',
     func: async ({ log, step }) => {
       log({ message: 'open' })
       await step({ stepName: 'step1', func: async () => 'foo' })

@@ -1,4 +1,5 @@
 import { OperationFunction } from './OperationFunction'
+import { OperationSaveStrategy } from './OperationSaveStrategy'
 
 /**
  * Defines an operation.
@@ -16,9 +17,10 @@ export interface OperationDefinition<Input, Services> {
 
   /**
    * True if operations should be saved when the input is received
-   * and after each completed step.
+   * and after each completed step.  If false, then progress is
+   * only saved if an error occurs.
    */
-  saveProgress?: boolean
+  saveModel: OperationSaveStrategy
 
   /**
    * The function that defines the steps of the operation.

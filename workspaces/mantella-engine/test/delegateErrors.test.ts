@@ -59,6 +59,6 @@ test('An error saving an operation is swallowed.', async () => {
 
   await expect(mantella.startOperation(startOpParams)).resolves.not.toThrow()
   expect(startOpParams.sendResponse).toHaveBeenCalledTimes(1)
-  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'completed', error: null, lastCompletedStep: 'step1' })
+  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'completed', operationError: null, operationOutput: null, lastCompletedStep: 'step1' })
   expect(saveAttempts).toBeGreaterThan(0)
 })

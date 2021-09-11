@@ -1,5 +1,8 @@
 name: CI
 
+env:
+  NODE_VERSION: "16.9.1"
+
 on:
   push:
     branches-ignore:
@@ -14,7 +17,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v1
       with:
-        node-version: 15.x
+        node-version: ${{ env.NODE_VERSION }}
     - name: Install deps
       run: npm ci
     - name: Build interfaces library

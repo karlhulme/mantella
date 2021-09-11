@@ -24,6 +24,6 @@ export async function getOperationHandler (props: RequestHandlerProps): Promise<
       json: { record: result.record }
     })
   } catch (err) {
-    applyErrorToHttpResponse(props.req, props.res, { err })
+    applyErrorToHttpResponse(props.req, props.res, { err: err as Error })
   }
 }

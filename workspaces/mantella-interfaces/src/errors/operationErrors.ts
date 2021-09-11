@@ -25,10 +25,11 @@ import { MantellaError } from './baseError'
  export class MantellaOperationRejectedError extends MantellaOperationError {
   /**
    * Constructs a new instance.
-   * @param rejectionMessage The reason for the rejection.
+   * @param code The code for the rejection.
+   * @param message The reason for the rejection.
    */
-  constructor (readonly rejectionMessage: string) {
-    super(`The operation has been rejected.  ${rejectionMessage}`)
+  constructor (code: string, message: string) {
+    super(`${code} ${message}`)
     Object.setPrototypeOf(this, new.target.prototype)
     this.name = this.constructor.name
   }
@@ -44,7 +45,7 @@ import { MantellaError } from './baseError'
    * @param message The reason the request cannot be processed.
    */
   constructor (message: string) {
-    super(message)
+    super('MALFORMED_INPUT ' +message)
     Object.setPrototypeOf(this, new.target.prototype)
     this.name = this.constructor.name
   }

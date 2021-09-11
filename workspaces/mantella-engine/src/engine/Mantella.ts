@@ -197,7 +197,8 @@ export class Mantella<Services> implements MantellaEngine {
       sendResponse: () => props.sendResponse && props.sendResponse({
         operationId: record.id,
         operationStatus: record.status,
-        error: record.error,
+        operationError: record.error,
+        operationOutput: record.output,
         lastCompletedStep: this.getLastCompletedStep(record)
       }),
       saveOperation: async () => { await this.invokeSaveOperationToDatabase(record) },
@@ -251,7 +252,8 @@ export class Mantella<Services> implements MantellaEngine {
       operation,
       sendResponse: () => props.sendResponse && props.sendResponse({
         operationStatus: record.status,
-        error: record.error,
+        operationError: record.error,
+        operationOutput: record.output,
         lastCompletedStep: this.getLastCompletedStep(record)
       }),
       saveOperation: async () => { await this.invokeSaveOperationToDatabase(record) },

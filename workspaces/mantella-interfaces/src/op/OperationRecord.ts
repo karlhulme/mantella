@@ -24,6 +24,11 @@ export interface OperationRecord {
   input: unknown
 
   /**
+   * The optional output that is being produced by the operation.
+   */
+  output: Record<string, unknown>|null
+
+  /**
    * The ISO date and time when the operation started.
    */
   started: string

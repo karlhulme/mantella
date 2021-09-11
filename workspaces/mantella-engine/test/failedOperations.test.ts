@@ -25,7 +25,7 @@ test('Start a new operation that fails due to an unknown error inbetween steps.'
 
   await expect(mentella.startOperation(startOpParams)).resolves.not.toThrow()
   expect(startOpParams.sendResponse).toHaveBeenCalledTimes(1)
-  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'failed', error: expect.stringContaining('OP_FAILED'), lastCompletedStep: '^' })
+  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'failed', operationError: expect.stringContaining('OP_FAILED'), operationOutput: null, lastCompletedStep: '^' })
 })
 
 test('Start a new operation that fails due to an unknown error within a step.', async () => {
@@ -44,7 +44,7 @@ test('Start a new operation that fails due to an unknown error within a step.', 
 
   await expect(mentella.startOperation(startOpParams)).resolves.not.toThrow()
   expect(startOpParams.sendResponse).toHaveBeenCalledTimes(1)
-  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'failed', error: expect.stringContaining('STEP_ERROR'), lastCompletedStep: '^' })
+  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'failed', operationError: expect.stringContaining('STEP_ERROR'), operationOutput: null, lastCompletedStep: '^' })
 })
 
 test('Start a new operation that rejects bad input.', async () => {
@@ -59,7 +59,7 @@ test('Start a new operation that rejects bad input.', async () => {
 
   await expect(mentella.startOperation(startOpParams)).resolves.not.toThrow()
   expect(startOpParams.sendResponse).toHaveBeenCalledTimes(1)
-  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'rejected', error: expect.stringContaining('BAD_INPUT'), lastCompletedStep: '^' })
+  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'rejected', operationError: expect.stringContaining('BAD_INPUT'), operationOutput: null, lastCompletedStep: '^' })
 })
 
 test('Start a new operation that rejects due to invalid state/request.', async () => {
@@ -67,7 +67,7 @@ test('Start a new operation that rejects due to invalid state/request.', async (
     loadedOperation: null,
     operationDefinition: {
       func: async () => {
-        throw new MantellaOperationRejectedError('MANUALLY_REJECT')
+        throw new MantellaOperationRejectedError('MANUALLY_REJECT', 'manual reason')
       }
     }
   })
@@ -75,7 +75,7 @@ test('Start a new operation that rejects due to invalid state/request.', async (
 
   await expect(mentella.startOperation(startOpParams)).resolves.not.toThrow()
   expect(startOpParams.sendResponse).toHaveBeenCalledTimes(1)
-  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'rejected', error: expect.stringContaining('MANUALLY_REJECT'), lastCompletedStep: '^' })
+  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'rejected', operationError: expect.stringContaining('MANUALLY_REJECT manual reason'), operationOutput: null, lastCompletedStep: '^' })
 })
 
 test('Start a new operation that is interrupted by a shutdown.', async () => {
@@ -89,5 +89,5 @@ test('Start a new operation that is interrupted by a shutdown.', async () => {
 
   await expect(mentella.startOperation(startOpParams)).resolves.not.toThrow()
   expect(startOpParams.sendResponse).toHaveBeenCalledTimes(1)
-  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'interrupted', error: expect.stringContaining('interrupted'), lastCompletedStep: '^' })
+  expect(startOpParams.sendResponse).toHaveBeenCalledWith({ operationId: '1234', operationStatus: 'interrupted', operationError: expect.stringContaining('interrupted'), operationOutput: null, lastCompletedStep: '^' })
 })

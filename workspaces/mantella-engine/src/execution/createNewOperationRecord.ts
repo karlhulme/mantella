@@ -17,6 +17,7 @@ export function createNewOperationRecord (operationId: string, operationName: st
     stepDataEntries: [],
     status: 'running',
     durationInMs: 0,
-    error: null
+    error: null,
+    output: null
   })
 }

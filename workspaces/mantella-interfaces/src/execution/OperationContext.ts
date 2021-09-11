@@ -1,4 +1,5 @@
 import { OperationContextLogProps } from './OperationContextLogProps'
+import { OperationContextOutputProps } from './OperationContextOutputProps'
 import { OperationContextStepProps } from './OperationContextStepProps'
 
 /**
@@ -34,4 +35,9 @@ export interface OperationContext<Input, Services> {
    * A function for executing a step in an atomic, retryable manner.
    */
   step: <T>(props: OperationContextStepProps<T>) => Promise<T>
+
+  /**
+   * A function for specifying the output of the operation.
+   */
+  output: (props: OperationContextOutputProps) => void
 }

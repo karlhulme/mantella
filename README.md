@@ -21,8 +21,8 @@ Define a series of multi-step operations, each one conforming to the `OperationD
   const myOperation: OperationDefinition<string, string> = {
     name: 'testOp', // name the operation
     inputValidator: () => undefined, // raise an exception if the input is not what you expect 
-    saveProgress: false, // set to true if the operation must be saved, useful for critical operations
-    func: async ({ log, pause, services, step }) => {
+    saveModel: error, // the operation will be saved if an error occurs
+    func: async ({ log, output, pause, services, step }) => {
       log({ message: 'open' }) // log messages at any point
       pause(100) // pause execution for a number of milliseconds
       await step({ // execute a step...
@@ -30,12 +30,13 @@ Define a series of multi-step operations, each one conforming to the `OperationD
         func: async () => services.callExternalService('foo'), // the meat of the step that probably makes a network call
         isErrorTransient: err => err.statusCode === 503, // decide which errors are transient so that the engine can keep trying the step
         retryIntervalsInMilliseconds: [100, 200, 400] // the retry strategy expressed as the number of milliseconds between each attempt
-      })
+      }),
+      output({ value: { result: 'some_data' }}) // record the output of the operation
     }
   }
 ```
 
-The last line, `await step(...)` is perhaps the most illustrative.  These are the steps that really define an operation.  The step function parameters are as follows:
+The penultimate line, `await step(...)` is perhaps the most illustrative.  These are the steps that really define an operation.  The step function parameters are as follows:
 * **stepName** - The name of the step.  This is how the engine ensures that each step is only run once, so it must be unique.
 * **func** - The actual function to run.  You'll typically want to call external services and databases here.  You can access those via the `services` object that is passed to the Mantella engine when it is created.
 * **isErrorTransient** - A function that takes an `Error` and returns true if the error is transient.  This instructs the Mantella engine to keep trying this step until it succeeds.  You can inspect an error's status code or examine its "type" or any other mechanism you want to determine if it's safe to retry.  If an error occurs and it cannot be retried then the operation will fail at this point.
@@ -81,9 +82,27 @@ You can host mantella on a web server using the express handler.
 ```
 
 
+## Save Model
+
+The `saveModel` property of the operation determines when operation is saved to the database so that it can be audited and resumed.
+
+Note the operation is always saved if any of the following conditions are met:
+
+* The client supplies an operation id that it wants to use for tracking the operation.
+* The operation is interrupted because of a shutdown.
+* An operation is resumed (and thus has already been saved once).
+
+Otherwise the save model is applied as follows:
+
+* **never** - means the operation is never saved regardless of outcome.  This is the fastest setting but offers no auditability.
+* **error** - this is the most common, as it doesn't spend time saving unless an internal error occurs.
+* **rejection** - the operation is saved if the input is rejected.  Use this for operations where you need to audit any failures, such as user sign ups.
+* **always** - the operation is saved at every point of progress.  It is the slowest operation type but important requests cannot be lost.  Use this for critical operations such as payments.
+
+
 ## Principles
 
-A Mantella service is concerned only with mutating data by processing a series of steps.  It is not for handling any type of client query.  For this reason, a mantella service should not return data.  Typically a graph service may define mutations that are serviced by a Mantella-based service, and then the graph service can query for data and return that to the client.
+A Mantella service is concerned with mutating data by processing a series of steps.  An operation may produce output, but it's not intended for client queries.  Typically a graph service may define mutations that are serviced by a Mantella-based service, and then the graph service can query for data and return that to the client.
 
 
 ## Request vs Operations
@@ -96,17 +115,7 @@ The `resolveStep` value refers to the name of the step that you want completed b
 
 You can also specify the hat/caret symbol `^` which indicates the engine should return as soon as the input is validated.
 
-
-## Saving operations
-
-An operation is saved if an error occurs.
-
-In addition, an operation is saved at every stage of processing if any of the following conditions are met:
-* the request to start the operation includes an operationId.
-* the operation definition has the saveProgress flag set.
-* an operation is resumed (and thus has already been saved once).
-
-Otherwise, an operation is not saved.  This reduces the database IO burden associated with running an operation but it means you cannot review the operation after the event.
+You can also specify the question mark symbol `?` which indicates the engine should return as soon as output is available.
 
 
 ## Shutdown

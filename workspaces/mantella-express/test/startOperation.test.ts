@@ -21,6 +21,30 @@ test('200 - start a new operation', async () => {
   })
 })
 
+test('200 - start a new operation that generates output', async () => {
+  const { testableApp } = createTestableApp({
+    mantellaEngine: {
+      startOperation: jest.fn(async (startProps: StartOperationProps) => {
+        startProps && startProps.sendResponse && startProps.sendResponse({
+          operationId: startProps.operationId || '1234',
+          operationStatus: 'completed',
+          lastCompletedStep: 'step1',
+          operationError: null,
+          operationOutput: { out: 'put'}
+        })
+      })
+    }
+  })
+
+  const response = await supertest(testableApp)
+    .post('/root/ops:testOp')
+    .set('x-api-key', 'adminKey')
+    .send({ foo: 'bar' })
+
+  expect(response.status).toEqual(200)
+  expect(response.body).toEqual({ out: 'put' })
+})
+
 test('200 - start a new operation with an explicit request/operation id', async () => {
   const { testableApp, mockMantellaEngine } = createTestableApp()
   const response = await supertest(testableApp)
@@ -49,7 +73,8 @@ test('202 - start a new operation with a resolve step', async () => {
           operationId: startProps.operationId || '1234',
           operationStatus: 'running',
           lastCompletedStep: 'step1',
-          error: null
+          operationError: null,
+          operationOutput: null
         })
       })
     }
@@ -81,7 +106,8 @@ test('400 - start a new operation that fails due to a client input error', async
           operationId: startProps.operationId || '1234',
           operationStatus: 'rejected',
           lastCompletedStep: 'step1',
-          error: 'BAD_INPUT'
+          operationError: 'BAD_INPUT',
+          operationOutput: null
         })
       })
     }
@@ -104,7 +130,8 @@ test('500 - start a new operation that fails due to the service shutting down', 
           operationId: startProps.operationId || '1234',
           operationStatus: 'interrupted',
           lastCompletedStep: 'step1',
-          error: 'INTERRUPT'
+          operationError: 'INTERRUPT',
+          operationOutput: null
         })
       })
     }
@@ -127,7 +154,8 @@ test('500 - start a new operation that fails due to a failed operation', async (
           operationId: startProps.operationId || '1234',
           operationStatus: 'failed',
           lastCompletedStep: 'step1',
-          error: 'FAILED'
+          operationError: 'FAILED',
+          operationOutput: null
         })
       })
     }
