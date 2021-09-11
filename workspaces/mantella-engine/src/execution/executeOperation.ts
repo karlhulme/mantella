@@ -3,7 +3,7 @@ import { OperationContext, OperationDefinition, OperationRecord } from 'mantella
 import { validateOperationInput } from './validateOperationInput'
 import { executeStep } from './executeStep'
 import { determineOperationStatusFromError } from './determineOperationStatusFromError'
-import { RESOLVE_IMMEDIATELY, RESOLVE_ON_OUTPUT } from '../consts'
+import { RESOLVE_IMMEDIATELY } from '../consts'
 import { OperationSaveStrategy } from 'mantella-interfaces/types/opDefs/OperationSaveStrategy'
 
 /**
@@ -111,7 +111,7 @@ export async function executeOperation (props: ExecuteOperationProps): Promise<v
     output: ({ value }) => {
       props.record.output = value
 
-      if (props.resolveStep === RESOLVE_ON_OUTPUT && !hasSentResponse) {
+      if (!props.resolveStep && !hasSentResponse) {
         hasSentResponse = true
         props.sendResponse()
       }

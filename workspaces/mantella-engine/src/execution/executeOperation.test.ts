@@ -48,7 +48,7 @@ function createTestParams () {
       output: null
     } as OperationRecord,
     saveProgress: false,
-    resolveStep: null as string|null,
+    resolveStep: '.' as string|null,
     services: null
   }
 }
@@ -111,7 +111,7 @@ test('An operation can be executed with the resolution occurring immediately.', 
 
 test('An operation can be executed with the resolution occurring once the output is available.', async () => {
   const params = createTestParams()
-  params.resolveStep = '?'
+  params.resolveStep = null
   let earlyStatus = ''
   let earlyOutput: unknown = null
   params.sendResponse = jest.fn(() => { earlyStatus = params.record.status, earlyOutput = params.record.output })

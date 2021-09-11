@@ -115,7 +115,7 @@ The `resolveStep` value refers to the name of the step that you want completed b
 
 You can also specify the hat/caret symbol `^` which indicates the engine should return as soon as the input is validated.
 
-You can also specify the question mark symbol `?` which indicates the engine should return as soon as output is available.
+By convention, you can specify the period symbol `.` to indicate the engine should only return when the operation is completed.  This has the same effect as specifying a step name that is not used by the operation.
 
 
 ## Shutdown
