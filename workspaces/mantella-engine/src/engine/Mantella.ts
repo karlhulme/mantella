@@ -316,7 +316,7 @@ export class Mantella<Services> implements MantellaEngine {
     try {
       loadResult = await this.loadOperationFromDatabase({ id: operationId })
     } catch (err) {
-      throw new MantellaLoadOperationFromDatabaseUnexpectedError(err)
+      throw new MantellaLoadOperationFromDatabaseUnexpectedError(err as Error)
     }
 
     if (typeof loadResult !== 'object') {
