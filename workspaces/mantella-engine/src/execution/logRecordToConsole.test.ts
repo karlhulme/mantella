@@ -19,7 +19,8 @@ function createOperationRecord (): OperationRecord {
     }],
     status: 'completed',
     durationInMs: 3000,
-    error: null
+    error: null,
+    output: null
   } 
 }
 
