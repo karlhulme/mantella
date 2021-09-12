@@ -18,12 +18,12 @@ export interface ResumeOperationSendResponseProps {
   /**
    * The details of any error attached to the operation.
    */
-   operationError: string|null
+  operationError: string|null
 
    /**
     * The details of any output data attached to the operation.
     */
-   operationOutput: Record<string, unknown>|null
+  operationOutput: Record<string, unknown>|null
 
   /**
    * The name of the last completed step, or the caret/hat symbol

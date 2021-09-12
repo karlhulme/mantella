@@ -6,4 +6,4 @@ import { OperationContext } from '../execution'
  * operation input, interact with the host and invoke actions on
  * services.
  */
-export type OperationFunction<Input, Services> = (context: OperationContext<Input, Services>) => Promise<void>
+export type OperationFunction<Input, Services, Output> = (context: OperationContext<Input, Services, Output>) => Promise<void>

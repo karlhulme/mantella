@@ -24,7 +24,7 @@ interface ExecuteOperationProps {
   /**
    * The operation definition that defines the operation to be run.
    */
-  operation: OperationDefinition<unknown, unknown>
+  operation: OperationDefinition<unknown, unknown, unknown>
 
   /**
    * A function that can be called when it is time to send a
@@ -88,7 +88,7 @@ export async function executeOperation (props: ExecuteOperationProps): Promise<v
 
   // Create the context that holds all the data associated with
   // an operation while it executes.
-  const context: OperationContext<unknown, unknown> = {
+  const context: OperationContext<unknown, unknown, unknown> = {
     input: props.record.input,
     log: ({ message }) => props.record.logEntries.push({ message, dateTime: new Date().toISOString() }),
     pause: milliseconds => pause(milliseconds),
@@ -109,7 +109,7 @@ export async function executeOperation (props: ExecuteOperationProps): Promise<v
       })
     },
     output: ({ value }) => {
-      props.record.output = value
+      props.record.output = value as Record<string, unknown>|null
 
       if (!props.resolveStep && !hasSentResponse) {
         hasSentResponse = true

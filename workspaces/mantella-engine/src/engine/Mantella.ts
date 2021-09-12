@@ -39,7 +39,7 @@ export interface MantellaConstructorProps<Services> {
   /**
    * An array of operation definitions.
    */
-  operations?: OperationDefinition<unknown, unknown>[]
+  operations?: OperationDefinition<unknown, unknown, unknown>[]
 
   /**
    * A function that can load an existing operation based on the id.
@@ -84,7 +84,7 @@ export class Mantella<Services> implements MantellaEngine {
   private defaultRetryIntervalsInMilliseconds: number[]
   private loadOperationFromDatabase: (props: LoadOperationFromDatabaseProps) => Promise<LoadOperationFromDatabaseResult>
   private logToConsole: boolean
-  private operations: OperationDefinition<unknown, unknown>[]
+  private operations: OperationDefinition<unknown, unknown, unknown>[]
   private saveOperationToDatabase: (props: SaveOperationToDatabaseProps) => Promise<void>
   private services: Services
 

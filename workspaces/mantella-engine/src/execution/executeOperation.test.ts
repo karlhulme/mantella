@@ -13,7 +13,11 @@ interface TestServices {
   serviceA: number
 }
 
-function createTestDefinition (): OperationDefinition<TestInput, TestServices> {
+interface TestOutput {
+  out: string
+}
+
+function createTestDefinition (): OperationDefinition<TestInput, TestServices, TestOutput> {
   return {
     name: 'testOp',
     inputValidator: () => ({ foo: 'bar' }),
@@ -31,7 +35,7 @@ function createTestParams () {
   return {
     canContinueProcessing: () => true,
     defaultRetryIntervalsInMilliseconds: [100, 200],
-    operation: createTestDefinition() as OperationDefinition<unknown, unknown>,
+    operation: createTestDefinition() as OperationDefinition<unknown, unknown, unknown>,
     sendResponse: jest.fn(),
     saveOperation: jest.fn(async () => undefined),
     record: {

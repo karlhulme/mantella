@@ -4,7 +4,7 @@ import { OperationSaveStrategy } from './OperationSaveStrategy'
 /**
  * Defines an operation.
  */
-export interface OperationDefinition<Input, Services> {
+export interface OperationDefinition<Input, Services, Output> {
   /**
    * The name of the operation.
    */
@@ -25,5 +25,5 @@ export interface OperationDefinition<Input, Services> {
   /**
    * The function that defines the steps of the operation.
    */
-  func: OperationFunction<Input, Services>
+  func: OperationFunction<Input, Services, Output>
 }

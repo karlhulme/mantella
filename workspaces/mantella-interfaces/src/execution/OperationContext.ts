@@ -5,7 +5,7 @@ import { OperationContextStepProps } from './OperationContextStepProps'
 /**
  * Represents the context that is passed to an operation as it executes.
  */
-export interface OperationContext<Input, Services> {
+export interface OperationContext<Input, Services, Output> {
   /**
    * The input originally supplied to the operation.
    */
@@ -39,5 +39,5 @@ export interface OperationContext<Input, Services> {
   /**
    * A function for specifying the output of the operation.
    */
-  output: (props: OperationContextOutputProps) => void
+  output: (props: OperationContextOutputProps<Output>) => void
 }
