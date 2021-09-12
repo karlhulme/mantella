@@ -31,7 +31,7 @@ export function createTestMantella (props?: CreateMantellaProps): Mantella<strin
 
   Object.assign(record, props?.loadedOperation)
 
-  const operation: OperationDefinition<string, string> = {
+  const operation: OperationDefinition<string, string, string> = {
     name: 'testOp',
     inputValidator: () => undefined,
     saveModel: 'error',
@@ -52,7 +52,7 @@ export function createTestMantella (props?: CreateMantellaProps): Mantella<strin
     }],
     loadOperationFromDatabase: async () => ({ record: props?.loadedOperation === null ? undefined : record }),
     saveOperationToDatabase: async () => undefined,
-    operations: [operation as OperationDefinition<unknown, unknown>],
+    operations: [operation as OperationDefinition<unknown, unknown, unknown>],
     services: 'theServices',
     logToConsole: false    
   }

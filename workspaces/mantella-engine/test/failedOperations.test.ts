@@ -29,7 +29,7 @@ test('Start a new operation that fails due to an unknown error inbetween steps.'
 })
 
 test('Start a new operation that fails due to an unknown error within a step.', async () => {
-  const func: OperationFunction<string, string> = async ({ step }) => {
+  const func: OperationFunction<string, string, string> = async ({ step }) => {
     await step({ stepName: 'step1', func: () => { throw new Error('STEP_ERROR') } })
   }
 
